@@ -302,6 +302,25 @@
     padding:0 20px;
     line-height:1.6;
   }
+  .q-image-wrap{
+    border:1px solid var(--line);
+    border-radius:8px;
+    overflow:hidden;
+    background:#fff;
+  }
+  .q-image-wrap img{
+    width:100%;
+    display:block;
+  }
+  .answer-link{
+    display:inline-block;
+    margin-top:8px;
+    font-size:12px;
+    color:var(--text-dim);
+    text-decoration:none;
+    border-bottom:1px dotted var(--text-dim);
+  }
+  .answer-link:hover{ color:var(--accent); border-color:var(--accent); }
   .answer-toggle{
     margin-top:10px;
     background:transparent;
@@ -901,14 +920,26 @@ $("#toStep4").addEventListener("click", () => {
 $("#backTo2").addEventListener("click", () => goStep(2));
 
 // STEP 4
-// label이 "문제"면 pdfs/problems/, "정답"이면 pdfs/answers/ 폴더에서 찾습니다.
-function pdfBlock(label, pdfFile, page){
-  if(!pdfFile){
-    return `<div class="pdf-frame-wrap"><div class="pdf-missing">${label} PDF 준비중<br>pdfs/ 폴더에 파일을 넣고 QUESTION_MAP에 파일명을 채워주세요</div></div>`;
+const CROPS_BASE = "pdfs/crops/problems/"; // 문항별로 잘라낸 이미지 (파일명 = QUESTION_MAP의 key + .jpg)
+const MAX_RECOMMEND = 10; // 단원당 최대 추천 문항 수
+
+// 문제 이미지 블록. 잘라낸 이미지가 없으면 원본 PDF(#page=N)로 자동 대체합니다.
+function questionImageBlock(mkey, m){
+  const imgSrc = `${CROPS_BASE}${mkey}.jpg`;
+  const fallbackSrc = m.problemPdf ? `${PDF_BASE}problems/${m.problemPdf}#page=${m.problemPage || 1}` : "";
+  if(!m.problemPdf){
+    return `<div class="pdf-frame-wrap"><div class="pdf-missing">문제 PDF 준비중<br>pdfs/ 폴더에 파일을 넣고 QUESTION_MAP에 파일명을 채워주세요</div></div>`;
   }
-  const subfolder = label === "문제" ? "problems/" : "answers/";
-  const src = `${PDF_BASE}${subfolder}${pdfFile}#page=${page || 1}`;
-  return `<div class="pdf-frame-wrap"><iframe src="${src}" title="${label}"></iframe></div>`;
+  return `<div class="q-image-wrap" data-fallback="${fallbackSrc}">
+    <img src="${imgSrc}" alt="문제 이미지" loading="lazy">
+  </div>`;
+}
+
+// 정답 링크(가벼운 텍스트 링크로 대체 — 전체 PDF를 매번 불러오지 않도록 함)
+function answerLink(m){
+  if(!m.answerPdf) return "";
+  const href = `${PDF_BASE}answers/${m.answerPdf}#page=${m.answerPage || 1}`;
+  return `<a class="answer-link" href="${href}" target="_blank" rel="noopener">정답표 원본 PDF 보기 →</a>`;
 }
 
 function renderRecommendations(){
@@ -938,7 +969,7 @@ function renderRecommendations(){
     wrap.appendChild(badge);
 
     // 같은 단원의 다른 문항 추천 (자기 자신 제외)
-    const matches = Object.entries(QUESTION_MAP).filter(
+    let matches = Object.entries(QUESTION_MAP).filter(
       ([k, v]) => k !== key && v.unit === info.unit
     );
 
@@ -950,6 +981,26 @@ function renderRecommendations(){
       return;
     }
 
+    // 연관성(같은 난이도 우선) → 최근 연도 순으로 정렬 후 상위 N개만 노출
+    const yearOf = (k) => parseInt(k.match(/^(\d{4})/)[1], 10);
+    matches.sort((a, b) => {
+      const [ka, va] = a, [kb, vb] = b;
+      const relA = va.level === info.level ? 1 : 0;
+      const relB = vb.level === info.level ? 1 : 0;
+      if(relA !== relB) return relB - relA;
+      return yearOf(kb) - yearOf(ka);
+    });
+    const totalCount = matches.length;
+    matches = matches.slice(0, MAX_RECOMMEND);
+
+    if(totalCount > matches.length){
+      const info2 = document.createElement("div");
+      info2.className = "empty-note";
+      info2.style.marginBottom = "10px";
+      info2.textContent = `'${info.unit}' 단원 전체 ${totalCount}문항 중, 난이도가 비슷하고 최근 연도인 문제 ${matches.length}개를 추천합니다.`;
+      wrap.appendChild(info2);
+    }
+
     matches.forEach(([mkey, m]) => {
       const block = document.createElement("div");
       block.className = "rec-block";
@@ -957,15 +1008,28 @@ function renderRecommendations(){
       block.innerHTML = `
         <div class="title">${m.examLabel} ${mkey.split("__")[1]}번 <span class="sample-flag">SAMPLE</span></div>
         <div class="meta">물리학Ⅰ &gt; ${m.unit} · 난이도: ${m.level} · 배점: ${m.points}점</div>
-        ${pdfBlock("문제", m.problemPdf, m.problemPage)}
+        ${questionImageBlock(mkey, m)}
         <button class="answer-toggle" data-target="${answerId}">정답 보기</button>
         <div class="answer-box" id="${answerId}">
           ${m.answer != null ? `<div class="plain">정답 ${m.answer}</div>` : ""}
-          ${pdfBlock("정답", m.answerPdf, m.answerPage)}
+          ${answerLink(m)}
         </div>
       `;
       wrap.appendChild(block);
     });
+  });
+
+  // 잘라낸 이미지가 없는 경우, 원본 PDF 뷰어로 자동 대체
+  wrap.querySelectorAll(".q-image-wrap img").forEach(img => {
+    img.addEventListener("error", () => {
+      const box = img.closest(".q-image-wrap");
+      const fallback = box.dataset.fallback;
+      if(fallback){
+        box.outerHTML = `<div class="pdf-frame-wrap"><iframe src="${fallback}" title="문제"></iframe></div>`;
+      } else {
+        box.outerHTML = `<div class="pdf-frame-wrap"><div class="pdf-missing">문제 이미지를 불러올 수 없습니다</div></div>`;
+      }
+    }, { once: true });
   });
 
   wrap.querySelectorAll(".answer-toggle").forEach(btn => {
