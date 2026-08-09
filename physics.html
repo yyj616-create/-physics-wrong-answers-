@@ -225,6 +225,31 @@
     font-size:12px;
     color:var(--accent);
   }
+  .count-select{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:16px;
+    font-size:12.5px;
+    color:var(--text-dim);
+  }
+  .count-select .opts{
+    display:flex;
+    gap:6px;
+  }
+  .count-btn{
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--text-dim);
+    border-radius:8px;
+    padding:6px 12px;
+    font-size:12.5px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .count-btn:hover{ border-color:var(--accent); color:var(--accent); }
+  .count-btn.active{ background:var(--accent-dim); border-color:var(--accent); color:var(--accent); }
   .wrong-badge{
     display:flex; align-items:center; gap:10px;
     background:var(--danger-dim);
@@ -399,6 +424,14 @@
     <section class="panel step" id="step4" style="display:none">
       <div class="rec-header">
         <label class="field-label" style="margin-bottom:0;"><span class="num">4</span> 추천 문제</label>
+      </div>
+      <div class="count-select">
+        <span>추천 문항 수</span>
+        <div class="opts" id="countOpts">
+          <button type="button" class="count-btn active" data-count="10">10개</button>
+          <button type="button" class="count-btn" data-count="20">20개</button>
+          <button type="button" class="count-btn" data-count="30">30개</button>
+        </div>
       </div>
       <div id="recResults"></div>
       <button class="ghost" id="backTo3">← 다른 문제 체크하기</button>
@@ -921,7 +954,18 @@ $("#backTo2").addEventListener("click", () => goStep(2));
 
 // STEP 4
 const CROPS_BASE = "pdfs/crops/"; // 문항별로 잘라낸 이미지 (파일명 = QUESTION_MAP의 key + .jpg)
-const MAX_RECOMMEND = 10; // 단원당 최대 추천 문항 수
+let MAX_RECOMMEND = 10; // 단원당 최대 추천 문항 수 (기본 10, 버튼으로 20/30 선택 가능)
+
+document.querySelectorAll("#countOpts .count-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#countOpts .count-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    MAX_RECOMMEND = parseInt(btn.dataset.count, 10);
+    if(state.exam && state.wrongQuestions.length){
+      renderRecommendations();
+    }
+  });
+});
 
 // 문제 이미지 블록. 잘라낸 이미지가 없으면 원본 PDF(#page=N)로 자동 대체합니다.
 function questionImageBlock(mkey, m){
