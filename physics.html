@@ -389,30 +389,19 @@
       <span class="dot" data-step="1">1</span>
       <span class="dot" data-step="2">2</span>
       <span class="dot" data-step="3">3</span>
-      <span class="dot" data-step="4">4</span>
     </div>
   </header>
 
   <main>
-
-    <!-- STEP 1 -->
-    <section class="panel step" id="step1">
-      <label class="field-label"><span class="num">1</span> 이름을 입력하세요</label>
-      <input type="text" id="nameInput" placeholder="예: 홍길동">
-      <div class="hint">오답 기록은 이 화면을 벗어나면 초기화됩니다 (프로토타입 버전)</div>
-      <button class="primary" id="toStep2" disabled>다음 →</button>
+<!-- STEP 1 -->
+    <section class="panel step" id="step1" style="display:none">
+      <label class="field-label"><span class="num">1</span> 본인이 응시한 시험을 선택하세요</label>
+      <div class="exam-list" id="examList"></div>
     </section>
 
     <!-- STEP 2 -->
     <section class="panel step" id="step2" style="display:none">
-      <label class="field-label"><span class="num">2</span> 본인이 응시한 시험을 선택하세요</label>
-      <div class="exam-list" id="examList"></div>
-      <button class="ghost" id="backTo1">← 이름 다시 입력</button>
-    </section>
-
-    <!-- STEP 3 -->
-    <section class="panel step" id="step3" style="display:none">
-      <label class="field-label"><span class="num">3</span> 틀린 문항을 선택하세요</label>
+      <label class="field-label"><span class="num">2</span> 틀린 문항을 선택하세요</label>
       <div class="qgrid" id="qgrid"></div>
       <div class="hint">문항 번호를 누르면 오답으로 표시됩니다 (물리학Ⅰ은 1~20번). 단원은 자동으로 인식됩니다.</div>
 
@@ -420,10 +409,10 @@
       <button class="ghost" id="backTo2">← 시험 다시 선택</button>
     </section>
 
-    <!-- STEP 4 -->
-    <section class="panel step" id="step4" style="display:none">
+    <!-- STEP 3 -->
+    <section class="panel step" id="step3" style="display:none">
       <div class="rec-header">
-        <label class="field-label" style="margin-bottom:0;"><span class="num">4</span> 추천 문제</label>
+        <label class="field-label" style="margin-bottom:0;"><span class="num">3</span> 추천 문제</label>
       </div>
       <div class="count-select">
         <span>추천 문항 수</span>
@@ -928,7 +917,6 @@ const QUESTION_MAP = {
 /* ====================================================================== */
 
 let state = {
-  name: "",
   exam: null,
   wrongQuestions: [],   // [qnum, qnum, ...]
 };
@@ -947,16 +935,6 @@ function goStep(n){
 }
 
 // STEP 1
-$("#nameInput").addEventListener("input", (e) => {
-  state.name = e.target.value.trim();
-  $("#toStep2").disabled = state.name.length === 0;
-});
-$("#toStep2").addEventListener("click", () => {
-  $("#subLine").textContent = `${state.name} 학생의 오답 유사문제를 추천해 드려요`;
-  goStep(2);
-});
-
-// STEP 2
 function renderExamList(){
   const wrap = $("#examList");
   wrap.innerHTML = "";
@@ -977,15 +955,14 @@ function renderExamList(){
       div.classList.add("selected");
       state.wrongQuestions = [];
       renderGrid();
-      goStep(3);
+      goStep(2);
     });
     wrap.appendChild(div);
   });
 }
 renderExamList();
-$("#backTo1").addEventListener("click", () => goStep(1));
 
-// STEP 3
+// STEP 2
 function renderGrid(){
   const grid = $("#qgrid");
   grid.innerHTML = "";
@@ -1013,11 +990,11 @@ function toggleWrong(qnum, cell){
 
 $("#toStep4").addEventListener("click", () => {
   renderRecommendations();
-  goStep(4);
+  goStep(3);
 });
-$("#backTo2").addEventListener("click", () => goStep(2));
+$("#backTo2").addEventListener("click", () => goStep(1));
 
-// STEP 4
+// STEP 3
 const CROPS_BASE = "pdfs/crops/"; // 문항별로 잘라낸 이미지 (파일명 = QUESTION_MAP의 key + .jpg)
 let MAX_RECOMMEND = 10; // 단원당 최대 추천 문항 수 (기본 10, 버튼으로 20/30 선택 가능)
 
@@ -1150,11 +1127,11 @@ function renderRecommendations(){
   });
 }
 
-$("#backTo3").addEventListener("click", () => goStep(3));
+$("#backTo3").addEventListener("click", () => goStep(2));
 $("#restart").addEventListener("click", () => {
   state.exam = null;
   state.wrongQuestions = [];
-  goStep(2);
+  goStep(1);
 });
 
 goStep(1);
