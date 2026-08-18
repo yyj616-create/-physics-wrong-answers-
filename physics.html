@@ -250,6 +250,45 @@
   }
   .count-btn:hover{ border-color:var(--accent); color:var(--accent); }
   .count-btn.active{ background:var(--accent-dim); border-color:var(--accent); color:var(--accent); }
+
+  .wrong-reason-list{
+    margin:16px 0;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .wrong-reason-row{
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:12px 14px;
+  }
+  .wrong-reason-row .qlabel{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--danger);
+    margin-bottom:8px;
+  }
+  .reason-opts{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .reason-btn{
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--text-dim);
+    border-radius:8px;
+    padding:6px 10px;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    font-family:inherit;
+    line-height:1.4;
+  }
+  .reason-btn:hover{ border-color:var(--accent); color:var(--accent); }
+  .reason-btn.active{ background:var(--accent-dim); border-color:var(--accent); color:var(--accent); }
   .wrong-badge{
     display:flex; align-items:center; gap:10px;
     background:var(--danger-dim);
@@ -404,6 +443,7 @@
       <label class="field-label"><span class="num">2</span> 틀린 문항을 선택하세요</label>
       <div class="qgrid" id="qgrid"></div>
       <div class="hint">문항 번호를 누르면 오답으로 표시됩니다 (물리학Ⅰ은 1~20번). 단원은 자동으로 인식됩니다.</div>
+      <div id="wrongReasonList" class="wrong-reason-list"></div>
 
       <button class="primary" id="toStep4" disabled>추천 문제 받기</button>
       <button class="ghost" id="backTo2">← 시험 다시 선택</button>
@@ -487,431 +527,431 @@ const PDF_BASE = "pdfs/";
 // 2021~2026학년도 수능 물리학Ⅰ 전 문항 매핑 데이터 (실제 정답표 기준, 120문항)
 // 단원 분류는 문제 내용을 바탕으로 한 1차 분류이니, 확인 후 필요하면 수정해 주세요.
 const QUESTION_MAP = {
-  "2021su__1": { examLabel: "2021학년도 수능", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2021su_physics1.pdf", problemPage: 1, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 4 },
-  "2021su__2": { examLabel: "2021학년도 수능", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2021su_physics1.pdf", problemPage: 1, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 1 },
-  "2021su__3": { examLabel: "2021학년도 수능", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2021su_physics1.pdf", problemPage: 1, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2021su__4": { examLabel: "2021학년도 수능", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2021su_physics1.pdf", problemPage: 1, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2021su__5": { examLabel: "2021학년도 수능", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2021su_physics1.pdf", problemPage: 1, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2021su__6": { examLabel: "2021학년도 수능", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2021su_physics1.pdf", problemPage: 2, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2021su__7": { examLabel: "2021학년도 수능", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2021su_physics1.pdf", problemPage: 2, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 4 },
-  "2021su__8": { examLabel: "2021학년도 수능", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2021su_physics1.pdf", problemPage: 2, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 2 },
-  "2021su__9": { examLabel: "2021학년도 수능", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2021su_physics1.pdf", problemPage: 2, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 4 },
-  "2021su__10": { examLabel: "2021학년도 수능", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2021su_physics1.pdf", problemPage: 2, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 2 },
-  "2021su__11": { examLabel: "2021학년도 수능", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2021su_physics1.pdf", problemPage: 2, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2021su__12": { examLabel: "2021학년도 수능", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2021su_physics1.pdf", problemPage: 3, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 1 },
-  "2021su__13": { examLabel: "2021학년도 수능", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2021su_physics1.pdf", problemPage: 3, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 1 },
-  "2021su__14": { examLabel: "2021학년도 수능", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2021su_physics1.pdf", problemPage: 3, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 2 },
-  "2021su__15": { examLabel: "2021학년도 수능", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2021su_physics1.pdf", problemPage: 3, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2021su__16": { examLabel: "2021학년도 수능", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2021su_physics1.pdf", problemPage: 3, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2021su__17": { examLabel: "2021학년도 수능", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2021su_physics1.pdf", problemPage: 4, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 4 },
-  "2021su__18": { examLabel: "2021학년도 수능", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2021su_physics1.pdf", problemPage: 4, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 4 },
-  "2021su__19": { examLabel: "2021학년도 수능", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2021su_physics1.pdf", problemPage: 4, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 1 },
-  "2021su__20": { examLabel: "2021학년도 수능", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2021su_physics1.pdf", problemPage: 4, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 2 },
-  "2022su__1": { examLabel: "2022학년도 수능", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2022su_physics1.pdf", problemPage: 1, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 4 },
-  "2022su__2": { examLabel: "2022학년도 수능", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2022su_physics1.pdf", problemPage: 1, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 4 },
-  "2022su__3": { examLabel: "2022학년도 수능", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2022su_physics1.pdf", problemPage: 1, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2022su__4": { examLabel: "2022학년도 수능", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2022su_physics1.pdf", problemPage: 1, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2022su__5": { examLabel: "2022학년도 수능", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2022su_physics1.pdf", problemPage: 1, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2022su__6": { examLabel: "2022학년도 수능", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2022su_physics1.pdf", problemPage: 2, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 1 },
-  "2022su__7": { examLabel: "2022학년도 수능", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2022su_physics1.pdf", problemPage: 2, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2022su__8": { examLabel: "2022학년도 수능", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2022su_physics1.pdf", problemPage: 2, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 4 },
-  "2022su__9": { examLabel: "2022학년도 수능", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2022su_physics1.pdf", problemPage: 2, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 2 },
-  "2022su__10": { examLabel: "2022학년도 수능", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2022su_physics1.pdf", problemPage: 2, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 1 },
-  "2022su__11": { examLabel: "2022학년도 수능", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2022su_physics1.pdf", problemPage: 2, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 1 },
-  "2022su__12": { examLabel: "2022학년도 수능", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2022su_physics1.pdf", problemPage: 3, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2022su__13": { examLabel: "2022학년도 수능", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2022su_physics1.pdf", problemPage: 3, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 2 },
-  "2022su__14": { examLabel: "2022학년도 수능", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2022su_physics1.pdf", problemPage: 3, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 4 },
-  "2022su__15": { examLabel: "2022학년도 수능", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2022su_physics1.pdf", problemPage: 3, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2022su__16": { examLabel: "2022학년도 수능", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2022su_physics1.pdf", problemPage: 3, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2022su__17": { examLabel: "2022학년도 수능", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2022su_physics1.pdf", problemPage: 4, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2022su__18": { examLabel: "2022학년도 수능", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2022su_physics1.pdf", problemPage: 4, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 2 },
-  "2022su__19": { examLabel: "2022학년도 수능", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2022su_physics1.pdf", problemPage: 4, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2022su__20": { examLabel: "2022학년도 수능", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2022su_physics1.pdf", problemPage: 4, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 1 },
-  "2023su__1": { examLabel: "2023학년도 수능", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2023su_physics1.pdf", problemPage: 1, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 4 },
-  "2023su__2": { examLabel: "2023학년도 수능", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2023su_physics1.pdf", problemPage: 1, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2023su__3": { examLabel: "2023학년도 수능", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2023su_physics1.pdf", problemPage: 1, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2023su__4": { examLabel: "2023학년도 수능", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2023su_physics1.pdf", problemPage: 1, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 2 },
-  "2023su__5": { examLabel: "2023학년도 수능", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2023su_physics1.pdf", problemPage: 1, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 4 },
-  "2023su__6": { examLabel: "2023학년도 수능", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2023su_physics1.pdf", problemPage: 2, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2023su__7": { examLabel: "2023학년도 수능", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2023su_physics1.pdf", problemPage: 2, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 1 },
-  "2023su__8": { examLabel: "2023학년도 수능", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2023su_physics1.pdf", problemPage: 2, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 4 },
-  "2023su__9": { examLabel: "2023학년도 수능", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2023su_physics1.pdf", problemPage: 2, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2023su__10": { examLabel: "2023학년도 수능", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2023su_physics1.pdf", problemPage: 2, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2023su__11": { examLabel: "2023학년도 수능", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2023su_physics1.pdf", problemPage: 2, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 1 },
-  "2023su__12": { examLabel: "2023학년도 수능", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2023su_physics1.pdf", problemPage: 3, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 2 },
-  "2023su__13": { examLabel: "2023학년도 수능", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2023su_physics1.pdf", problemPage: 3, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2023su__14": { examLabel: "2023학년도 수능", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2023su_physics1.pdf", problemPage: 3, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 4 },
-  "2023su__15": { examLabel: "2023학년도 수능", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2023su_physics1.pdf", problemPage: 3, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 1 },
-  "2023su__16": { examLabel: "2023학년도 수능", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2023su_physics1.pdf", problemPage: 3, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2023su__17": { examLabel: "2023학년도 수능", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2023su_physics1.pdf", problemPage: 4, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 2 },
-  "2023su__18": { examLabel: "2023학년도 수능", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2023su_physics1.pdf", problemPage: 4, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2023su__19": { examLabel: "2023학년도 수능", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2023su_physics1.pdf", problemPage: 4, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2023su__20": { examLabel: "2023학년도 수능", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2023su_physics1.pdf", problemPage: 4, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 1 },
-  "2024su__1": { examLabel: "2024학년도 수능", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2024su_physics1.pdf", problemPage: 1, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 4 },
-  "2024su__2": { examLabel: "2024학년도 수능", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2024su_physics1.pdf", problemPage: 1, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 2 },
-  "2024su__3": { examLabel: "2024학년도 수능", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2024su_physics1.pdf", problemPage: 1, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 1 },
-  "2024su__4": { examLabel: "2024학년도 수능", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2024su_physics1.pdf", problemPage: 1, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 1 },
-  "2024su__5": { examLabel: "2024학년도 수능", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2024su_physics1.pdf", problemPage: 1, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 4 },
-  "2024su__6": { examLabel: "2024학년도 수능", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2024su_physics1.pdf", problemPage: 2, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 2 },
-  "2024su__7": { examLabel: "2024학년도 수능", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2024su_physics1.pdf", problemPage: 2, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2024su__8": { examLabel: "2024학년도 수능", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2024su_physics1.pdf", problemPage: 2, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2024su__9": { examLabel: "2024학년도 수능", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2024su_physics1.pdf", problemPage: 2, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2024su__10": { examLabel: "2024학년도 수능", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2024su_physics1.pdf", problemPage: 2, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 1 },
-  "2024su__11": { examLabel: "2024학년도 수능", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2024su_physics1.pdf", problemPage: 2, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 4 },
-  "2024su__12": { examLabel: "2024학년도 수능", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2024su_physics1.pdf", problemPage: 3, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 2 },
-  "2024su__13": { examLabel: "2024학년도 수능", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2024su_physics1.pdf", problemPage: 3, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2024su__14": { examLabel: "2024학년도 수능", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2024su_physics1.pdf", problemPage: 3, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2024su__15": { examLabel: "2024학년도 수능", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2024su_physics1.pdf", problemPage: 3, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2024su__16": { examLabel: "2024학년도 수능", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2024su_physics1.pdf", problemPage: 3, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2024su__17": { examLabel: "2024학년도 수능", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2024su_physics1.pdf", problemPage: 4, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 1 },
-  "2024su__18": { examLabel: "2024학년도 수능", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2024su_physics1.pdf", problemPage: 4, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2024su__19": { examLabel: "2024학년도 수능", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2024su_physics1.pdf", problemPage: 4, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 4 },
-  "2024su__20": { examLabel: "2024학년도 수능", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2024su_physics1.pdf", problemPage: 4, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 2 },
-  "2025su__1": { examLabel: "2025학년도 수능", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2025su_physics1.pdf", problemPage: 1, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 2 },
-  "2025su__2": { examLabel: "2025학년도 수능", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2025su_physics1.pdf", problemPage: 1, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2025su__3": { examLabel: "2025학년도 수능", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2025su_physics1.pdf", problemPage: 1, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 1 },
-  "2025su__4": { examLabel: "2025학년도 수능", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2025su_physics1.pdf", problemPage: 1, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2025su__5": { examLabel: "2025학년도 수능", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2025su_physics1.pdf", problemPage: 1, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 1 },
-  "2025su__6": { examLabel: "2025학년도 수능", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2025su_physics1.pdf", problemPage: 2, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 4 },
-  "2025su__7": { examLabel: "2025학년도 수능", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2025su_physics1.pdf", problemPage: 2, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2025su__8": { examLabel: "2025학년도 수능", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2025su_physics1.pdf", problemPage: 2, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2025su__9": { examLabel: "2025학년도 수능", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2025su_physics1.pdf", problemPage: 2, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 4 },
-  "2025su__10": { examLabel: "2025학년도 수능", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2025su_physics1.pdf", problemPage: 2, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2025su__11": { examLabel: "2025학년도 수능", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2025su_physics1.pdf", problemPage: 2, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 2 },
-  "2025su__12": { examLabel: "2025학년도 수능", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2025su_physics1.pdf", problemPage: 3, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 1 },
-  "2025su__13": { examLabel: "2025학년도 수능", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2025su_physics1.pdf", problemPage: 3, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 1 },
-  "2025su__14": { examLabel: "2025학년도 수능", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2025su_physics1.pdf", problemPage: 3, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2025su__15": { examLabel: "2025학년도 수능", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2025su_physics1.pdf", problemPage: 3, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2025su__16": { examLabel: "2025학년도 수능", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2025su_physics1.pdf", problemPage: 3, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 4 },
-  "2025su__17": { examLabel: "2025학년도 수능", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2025su_physics1.pdf", problemPage: 4, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2025su__18": { examLabel: "2025학년도 수능", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2025su_physics1.pdf", problemPage: 4, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2025su__19": { examLabel: "2025학년도 수능", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2025su_physics1.pdf", problemPage: 4, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2025su__20": { examLabel: "2025학년도 수능", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2025su_physics1.pdf", problemPage: 4, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 2 },
-  "2026su__1": { examLabel: "2026학년도 수능", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2026su_physics1.pdf", problemPage: 1, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2026su__2": { examLabel: "2026학년도 수능", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2026su_physics1.pdf", problemPage: 1, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 4 },
-  "2026su__3": { examLabel: "2026학년도 수능", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2026su_physics1.pdf", problemPage: 1, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2026su__4": { examLabel: "2026학년도 수능", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2026su_physics1.pdf", problemPage: 1, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 4 },
-  "2026su__5": { examLabel: "2026학년도 수능", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2026su_physics1.pdf", problemPage: 1, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 1 },
-  "2026su__6": { examLabel: "2026학년도 수능", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2026su_physics1.pdf", problemPage: 2, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 2 },
-  "2026su__7": { examLabel: "2026학년도 수능", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2026su_physics1.pdf", problemPage: 2, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2026su__8": { examLabel: "2026학년도 수능", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2026su_physics1.pdf", problemPage: 2, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2026su__9": { examLabel: "2026학년도 수능", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026su_physics1.pdf", problemPage: 2, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 3 },
-  "2026su__10": { examLabel: "2026학년도 수능", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026su_physics1.pdf", problemPage: 2, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2026su__11": { examLabel: "2026학년도 수능", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2026su_physics1.pdf", problemPage: 2, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 2 },
-  "2026su__12": { examLabel: "2026학년도 수능", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2026su_physics1.pdf", problemPage: 3, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 1 },
-  "2026su__13": { examLabel: "2026학년도 수능", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2026su_physics1.pdf", problemPage: 3, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2026su__14": { examLabel: "2026학년도 수능", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026su_physics1.pdf", problemPage: 3, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 2 },
-  "2026su__15": { examLabel: "2026학년도 수능", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2026su_physics1.pdf", problemPage: 3, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 1 },
-  "2026su__16": { examLabel: "2026학년도 수능", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2026su_physics1.pdf", problemPage: 3, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2026su__17": { examLabel: "2026학년도 수능", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2026su_physics1.pdf", problemPage: 4, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 5 },
-  "2026su__18": { examLabel: "2026학년도 수능", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2026su_physics1.pdf", problemPage: 4, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 2 },
-  "2026su__19": { examLabel: "2026학년도 수능", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026su_physics1.pdf", problemPage: 4, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 4 },
-  "2026su__20": { examLabel: "2026학년도 수능", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2026su_physics1.pdf", problemPage: 4, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 1 },
+  "2021su__1": { examLabel: "2021학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2021su_physics1.pdf", problemPage: 1, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 4 },
+  "2021su__2": { examLabel: "2021학년도 수능", unit: "물질과 전자기장", material: "개념 서술형", level: '상', points: 3, problemPdf: "2021su_physics1.pdf", problemPage: 1, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 1 },
+  "2021su__3": { examLabel: "2021학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2021su_physics1.pdf", problemPage: 1, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2021su__4": { examLabel: "2021학년도 수능", unit: "물질과 전자기장", material: "탐구·실험형", level: '상', points: 3, problemPdf: "2021su_physics1.pdf", problemPage: 1, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2021su__5": { examLabel: "2021학년도 수능", unit: "파동과 정보통신", material: "개념 서술형", level: '중', points: 2, problemPdf: "2021su_physics1.pdf", problemPage: 1, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2021su__6": { examLabel: "2021학년도 수능", unit: "역학과 에너지", material: "표(자료) 해석형", level: '중', points: 2, problemPdf: "2021su_physics1.pdf", problemPage: 2, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2021su__7": { examLabel: "2021학년도 수능", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2021su_physics1.pdf", problemPage: 2, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 4 },
+  "2021su__8": { examLabel: "2021학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2021su_physics1.pdf", problemPage: 2, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 2 },
+  "2021su__9": { examLabel: "2021학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2021su_physics1.pdf", problemPage: 2, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 4 },
+  "2021su__10": { examLabel: "2021학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2021su_physics1.pdf", problemPage: 2, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 2 },
+  "2021su__11": { examLabel: "2021학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2021su_physics1.pdf", problemPage: 2, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2021su__12": { examLabel: "2021학년도 수능", unit: "역학과 에너지", material: "표(자료) 해석형", level: '중', points: 2, problemPdf: "2021su_physics1.pdf", problemPage: 3, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 1 },
+  "2021su__13": { examLabel: "2021학년도 수능", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2021su_physics1.pdf", problemPage: 3, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 1 },
+  "2021su__14": { examLabel: "2021학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2021su_physics1.pdf", problemPage: 3, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 2 },
+  "2021su__15": { examLabel: "2021학년도 수능", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2021su_physics1.pdf", problemPage: 3, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2021su__16": { examLabel: "2021학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2021su_physics1.pdf", problemPage: 3, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2021su__17": { examLabel: "2021학년도 수능", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2021su_physics1.pdf", problemPage: 4, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 4 },
+  "2021su__18": { examLabel: "2021학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2021su_physics1.pdf", problemPage: 4, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 4 },
+  "2021su__19": { examLabel: "2021학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2021su_physics1.pdf", problemPage: 4, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 1 },
+  "2021su__20": { examLabel: "2021학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2021su_physics1.pdf", problemPage: 4, answerPdf: "2021su_physics1_answer.pdf", answerPage: 1, answer: 2 },
+  "2022su__1": { examLabel: "2022학년도 수능", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2022su_physics1.pdf", problemPage: 1, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 4 },
+  "2022su__2": { examLabel: "2022학년도 수능", unit: "물질과 전자기장", material: "개념 서술형", level: '중', points: 2, problemPdf: "2022su_physics1.pdf", problemPage: 1, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 4 },
+  "2022su__3": { examLabel: "2022학년도 수능", unit: "파동과 정보통신", material: "탐구·실험형", level: '상', points: 3, problemPdf: "2022su_physics1.pdf", problemPage: 1, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2022su__4": { examLabel: "2022학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2022su_physics1.pdf", problemPage: 1, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2022su__5": { examLabel: "2022학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2022su_physics1.pdf", problemPage: 1, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2022su__6": { examLabel: "2022학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2022su_physics1.pdf", problemPage: 2, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 1 },
+  "2022su__7": { examLabel: "2022학년도 수능", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2022su_physics1.pdf", problemPage: 2, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2022su__8": { examLabel: "2022학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2022su_physics1.pdf", problemPage: 2, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 4 },
+  "2022su__9": { examLabel: "2022학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2022su_physics1.pdf", problemPage: 2, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 2 },
+  "2022su__10": { examLabel: "2022학년도 수능", unit: "물질과 전자기장", material: "탐구·실험형", level: '상', points: 3, problemPdf: "2022su_physics1.pdf", problemPage: 2, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 1 },
+  "2022su__11": { examLabel: "2022학년도 수능", unit: "파동과 정보통신", material: "탐구·실험형", level: '상', points: 3, problemPdf: "2022su_physics1.pdf", problemPage: 2, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 1 },
+  "2022su__12": { examLabel: "2022학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2022su_physics1.pdf", problemPage: 3, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2022su__13": { examLabel: "2022학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2022su_physics1.pdf", problemPage: 3, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 2 },
+  "2022su__14": { examLabel: "2022학년도 수능", unit: "파동과 정보통신", material: "표(자료) 해석형", level: '중', points: 2, problemPdf: "2022su_physics1.pdf", problemPage: 3, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 4 },
+  "2022su__15": { examLabel: "2022학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2022su_physics1.pdf", problemPage: 3, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2022su__16": { examLabel: "2022학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2022su_physics1.pdf", problemPage: 3, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2022su__17": { examLabel: "2022학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2022su_physics1.pdf", problemPage: 4, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2022su__18": { examLabel: "2022학년도 수능", unit: "물질과 전자기장", material: "표(자료) 해석형", level: '상', points: 3, problemPdf: "2022su_physics1.pdf", problemPage: 4, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 2 },
+  "2022su__19": { examLabel: "2022학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2022su_physics1.pdf", problemPage: 4, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2022su__20": { examLabel: "2022학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2022su_physics1.pdf", problemPage: 4, answerPdf: "2022su_physics1_answer.pdf", answerPage: 1, answer: 1 },
+  "2023su__1": { examLabel: "2023학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2023su_physics1.pdf", problemPage: 1, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 4 },
+  "2023su__2": { examLabel: "2023학년도 수능", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2023su_physics1.pdf", problemPage: 1, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2023su__3": { examLabel: "2023학년도 수능", unit: "물질과 전자기장", material: "개념 서술형", level: '중', points: 2, problemPdf: "2023su_physics1.pdf", problemPage: 1, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2023su__4": { examLabel: "2023학년도 수능", unit: "파동과 정보통신", material: "개념 서술형", level: '상', points: 3, problemPdf: "2023su_physics1.pdf", problemPage: 1, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 2 },
+  "2023su__5": { examLabel: "2023학년도 수능", unit: "물질과 전자기장", material: "표(자료) 해석형", level: '중', points: 2, problemPdf: "2023su_physics1.pdf", problemPage: 1, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 4 },
+  "2023su__6": { examLabel: "2023학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2023su_physics1.pdf", problemPage: 2, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2023su__7": { examLabel: "2023학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2023su_physics1.pdf", problemPage: 2, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 1 },
+  "2023su__8": { examLabel: "2023학년도 수능", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2023su_physics1.pdf", problemPage: 2, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 4 },
+  "2023su__9": { examLabel: "2023학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2023su_physics1.pdf", problemPage: 2, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2023su__10": { examLabel: "2023학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2023su_physics1.pdf", problemPage: 2, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2023su__11": { examLabel: "2023학년도 수능", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2023su_physics1.pdf", problemPage: 2, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 1 },
+  "2023su__12": { examLabel: "2023학년도 수능", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2023su_physics1.pdf", problemPage: 3, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 2 },
+  "2023su__13": { examLabel: "2023학년도 수능", unit: "역학과 에너지", material: "표(자료) 해석형", level: '상', points: 3, problemPdf: "2023su_physics1.pdf", problemPage: 3, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2023su__14": { examLabel: "2023학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2023su_physics1.pdf", problemPage: 3, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 4 },
+  "2023su__15": { examLabel: "2023학년도 수능", unit: "물질과 전자기장", material: "탐구·실험형", level: '상', points: 3, problemPdf: "2023su_physics1.pdf", problemPage: 3, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 1 },
+  "2023su__16": { examLabel: "2023학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2023su_physics1.pdf", problemPage: 3, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2023su__17": { examLabel: "2023학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2023su_physics1.pdf", problemPage: 4, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 2 },
+  "2023su__18": { examLabel: "2023학년도 수능", unit: "물질과 전자기장", material: "표(자료) 해석형", level: '상', points: 3, problemPdf: "2023su_physics1.pdf", problemPage: 4, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2023su__19": { examLabel: "2023학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2023su_physics1.pdf", problemPage: 4, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2023su__20": { examLabel: "2023학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2023su_physics1.pdf", problemPage: 4, answerPdf: "2023su_physics1_answer.pdf", answerPage: 1, answer: 1 },
+  "2024su__1": { examLabel: "2024학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2024su_physics1.pdf", problemPage: 1, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 4 },
+  "2024su__2": { examLabel: "2024학년도 수능", unit: "물질과 전자기장", material: "표(자료) 해석형", level: '중', points: 2, problemPdf: "2024su_physics1.pdf", problemPage: 1, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 2 },
+  "2024su__3": { examLabel: "2024학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024su_physics1.pdf", problemPage: 1, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 1 },
+  "2024su__4": { examLabel: "2024학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2024su_physics1.pdf", problemPage: 1, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 1 },
+  "2024su__5": { examLabel: "2024학년도 수능", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024su_physics1.pdf", problemPage: 1, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 4 },
+  "2024su__6": { examLabel: "2024학년도 수능", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2024su_physics1.pdf", problemPage: 2, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 2 },
+  "2024su__7": { examLabel: "2024학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2024su_physics1.pdf", problemPage: 2, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2024su__8": { examLabel: "2024학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024su_physics1.pdf", problemPage: 2, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2024su__9": { examLabel: "2024학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024su_physics1.pdf", problemPage: 2, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2024su__10": { examLabel: "2024학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024su_physics1.pdf", problemPage: 2, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 1 },
+  "2024su__11": { examLabel: "2024학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2024su_physics1.pdf", problemPage: 2, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 4 },
+  "2024su__12": { examLabel: "2024학년도 수능", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2024su_physics1.pdf", problemPage: 3, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 2 },
+  "2024su__13": { examLabel: "2024학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024su_physics1.pdf", problemPage: 3, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2024su__14": { examLabel: "2024학년도 수능", unit: "파동과 정보통신", material: "탐구·실험형", level: '중', points: 2, problemPdf: "2024su_physics1.pdf", problemPage: 3, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2024su__15": { examLabel: "2024학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024su_physics1.pdf", problemPage: 3, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2024su__16": { examLabel: "2024학년도 수능", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2024su_physics1.pdf", problemPage: 3, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2024su__17": { examLabel: "2024학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024su_physics1.pdf", problemPage: 4, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 1 },
+  "2024su__18": { examLabel: "2024학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024su_physics1.pdf", problemPage: 4, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2024su__19": { examLabel: "2024학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024su_physics1.pdf", problemPage: 4, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 4 },
+  "2024su__20": { examLabel: "2024학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2024su_physics1.pdf", problemPage: 4, answerPdf: "2024su_physics1_answer.pdf", answerPage: 1, answer: 2 },
+  "2025su__1": { examLabel: "2025학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2025su_physics1.pdf", problemPage: 1, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 2 },
+  "2025su__2": { examLabel: "2025학년도 수능", unit: "물질과 전자기장", material: "개념 서술형", level: '중', points: 2, problemPdf: "2025su_physics1.pdf", problemPage: 1, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2025su__3": { examLabel: "2025학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2025su_physics1.pdf", problemPage: 1, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 1 },
+  "2025su__4": { examLabel: "2025학년도 수능", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2025su_physics1.pdf", problemPage: 1, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2025su__5": { examLabel: "2025학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2025su_physics1.pdf", problemPage: 1, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 1 },
+  "2025su__6": { examLabel: "2025학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2025su_physics1.pdf", problemPage: 2, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 4 },
+  "2025su__7": { examLabel: "2025학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2025su_physics1.pdf", problemPage: 2, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2025su__8": { examLabel: "2025학년도 수능", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2025su_physics1.pdf", problemPage: 2, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2025su__9": { examLabel: "2025학년도 수능", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2025su_physics1.pdf", problemPage: 2, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 4 },
+  "2025su__10": { examLabel: "2025학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2025su_physics1.pdf", problemPage: 2, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2025su__11": { examLabel: "2025학년도 수능", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2025su_physics1.pdf", problemPage: 2, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 2 },
+  "2025su__12": { examLabel: "2025학년도 수능", unit: "물질과 전자기장", material: "탐구·실험형", level: '중', points: 2, problemPdf: "2025su_physics1.pdf", problemPage: 3, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 1 },
+  "2025su__13": { examLabel: "2025학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2025su_physics1.pdf", problemPage: 3, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 1 },
+  "2025su__14": { examLabel: "2025학년도 수능", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2025su_physics1.pdf", problemPage: 3, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2025su__15": { examLabel: "2025학년도 수능", unit: "역학과 에너지", material: "표(자료) 해석형", level: '중', points: 2, problemPdf: "2025su_physics1.pdf", problemPage: 3, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2025su__16": { examLabel: "2025학년도 수능", unit: "역학과 에너지", material: "표(자료) 해석형", level: '상', points: 3, problemPdf: "2025su_physics1.pdf", problemPage: 3, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 4 },
+  "2025su__17": { examLabel: "2025학년도 수능", unit: "물질과 전자기장", material: "표(자료) 해석형", level: '중', points: 2, problemPdf: "2025su_physics1.pdf", problemPage: 4, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2025su__18": { examLabel: "2025학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2025su_physics1.pdf", problemPage: 4, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2025su__19": { examLabel: "2025학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2025su_physics1.pdf", problemPage: 4, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2025su__20": { examLabel: "2025학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2025su_physics1.pdf", problemPage: 4, answerPdf: "2025su_physics1_answer.pdf", answerPage: 1, answer: 2 },
+  "2026su__1": { examLabel: "2026학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026su_physics1.pdf", problemPage: 1, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2026su__2": { examLabel: "2026학년도 수능", unit: "물질과 전자기장", material: "표(자료) 해석형", level: '중', points: 2, problemPdf: "2026su_physics1.pdf", problemPage: 1, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 4 },
+  "2026su__3": { examLabel: "2026학년도 수능", unit: "파동과 정보통신", material: "개념 서술형", level: '중', points: 2, problemPdf: "2026su_physics1.pdf", problemPage: 1, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2026su__4": { examLabel: "2026학년도 수능", unit: "물질과 전자기장", material: "표(자료) 해석형", level: '상', points: 3, problemPdf: "2026su_physics1.pdf", problemPage: 1, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 4 },
+  "2026su__5": { examLabel: "2026학년도 수능", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026su_physics1.pdf", problemPage: 1, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 1 },
+  "2026su__6": { examLabel: "2026학년도 수능", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026su_physics1.pdf", problemPage: 2, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 2 },
+  "2026su__7": { examLabel: "2026학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026su_physics1.pdf", problemPage: 2, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2026su__8": { examLabel: "2026학년도 수능", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026su_physics1.pdf", problemPage: 2, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2026su__9": { examLabel: "2026학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026su_physics1.pdf", problemPage: 2, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 3 },
+  "2026su__10": { examLabel: "2026학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026su_physics1.pdf", problemPage: 2, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2026su__11": { examLabel: "2026학년도 수능", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026su_physics1.pdf", problemPage: 2, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 2 },
+  "2026su__12": { examLabel: "2026학년도 수능", unit: "파동과 정보통신", material: "표(자료) 해석형", level: '상', points: 3, problemPdf: "2026su_physics1.pdf", problemPage: 3, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 1 },
+  "2026su__13": { examLabel: "2026학년도 수능", unit: "물질과 전자기장", material: "탐구·실험형", level: '중', points: 2, problemPdf: "2026su_physics1.pdf", problemPage: 3, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2026su__14": { examLabel: "2026학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026su_physics1.pdf", problemPage: 3, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 2 },
+  "2026su__15": { examLabel: "2026학년도 수능", unit: "물질과 전자기장", material: "표(자료) 해석형", level: '상', points: 3, problemPdf: "2026su_physics1.pdf", problemPage: 3, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 1 },
+  "2026su__16": { examLabel: "2026학년도 수능", unit: "역학과 에너지", material: "표(자료) 해석형", level: '중', points: 2, problemPdf: "2026su_physics1.pdf", problemPage: 3, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2026su__17": { examLabel: "2026학년도 수능", unit: "물질과 전자기장", material: "표(자료) 해석형", level: '중', points: 2, problemPdf: "2026su_physics1.pdf", problemPage: 4, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 5 },
+  "2026su__18": { examLabel: "2026학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026su_physics1.pdf", problemPage: 4, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 2 },
+  "2026su__19": { examLabel: "2026학년도 수능", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026su_physics1.pdf", problemPage: 4, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 4 },
+  "2026su__20": { examLabel: "2026학년도 수능", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026su_physics1.pdf", problemPage: 4, answerPdf: "2026su_physics1_answer.pdf", answerPage: 1, answer: 1 },
 
   // ===== 모의고사 추가 (2021~2027학년도 6월/9월 모의평가, 240문항) =====
   // 단원 분류는 문제 텍스트 키워드 기반 1차 자동 분류입니다. 확인 후 필요하면 수정해 주세요.
-  "2021_9mo__1": { examLabel: "2021학년도 9월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2021_9mo__2": { examLabel: "2021학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2021_9mo__3": { examLabel: "2021학년도 9월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2021_9mo__4": { examLabel: "2021학년도 9월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2021_9mo__5": { examLabel: "2021학년도 9월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2021_9mo__6": { examLabel: "2021학년도 9월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2021_9mo__7": { examLabel: "2021학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2021_9mo__8": { examLabel: "2021학년도 9월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2021_9mo__9": { examLabel: "2021학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2021_9mo__10": { examLabel: "2021학년도 9월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2021_9mo__11": { examLabel: "2021학년도 9월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2021_9mo__12": { examLabel: "2021학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2021_9mo__13": { examLabel: "2021학년도 9월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2021_9mo__14": { examLabel: "2021학년도 9월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2021_9mo__15": { examLabel: "2021학년도 9월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2021_9mo__16": { examLabel: "2021학년도 9월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2021_9mo__17": { examLabel: "2021학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2021_9mo__18": { examLabel: "2021학년도 9월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2021_9mo__19": { examLabel: "2021학년도 9월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2021_9mo__20": { examLabel: "2021학년도 9월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2022_6mo__1": { examLabel: "2022학년도 6월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2022_6mo__2": { examLabel: "2022학년도 6월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2022_6mo__3": { examLabel: "2022학년도 6월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2022_6mo__4": { examLabel: "2022학년도 6월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2022_6mo__5": { examLabel: "2022학년도 6월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2022_6mo__6": { examLabel: "2022학년도 6월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2022_6mo__7": { examLabel: "2022학년도 6월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2022_6mo__8": { examLabel: "2022학년도 6월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2022_6mo__9": { examLabel: "2022학년도 6월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2022_6mo__10": { examLabel: "2022학년도 6월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2022_6mo__11": { examLabel: "2022학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2022_6mo__12": { examLabel: "2022학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2022_6mo__13": { examLabel: "2022학년도 6월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2022_6mo__14": { examLabel: "2022학년도 6월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2022_6mo__15": { examLabel: "2022학년도 6월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2022_6mo__16": { examLabel: "2022학년도 6월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2022_6mo__17": { examLabel: "2022학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2022_6mo__18": { examLabel: "2022학년도 6월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2022_6mo__19": { examLabel: "2022학년도 6월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2022_6mo__20": { examLabel: "2022학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2022_9mo__1": { examLabel: "2022학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2022_9mo__2": { examLabel: "2022학년도 9월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2022_9mo__3": { examLabel: "2022학년도 9월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2022_9mo__4": { examLabel: "2022학년도 9월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2022_9mo__5": { examLabel: "2022학년도 9월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2022_9mo__6": { examLabel: "2022학년도 9월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2022_9mo__7": { examLabel: "2022학년도 9월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2022_9mo__8": { examLabel: "2022학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2022_9mo__9": { examLabel: "2022학년도 9월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2022_9mo__10": { examLabel: "2022학년도 9월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2022_9mo__11": { examLabel: "2022학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2022_9mo__12": { examLabel: "2022학년도 9월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2022_9mo__13": { examLabel: "2022학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2022_9mo__14": { examLabel: "2022학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2022_9mo__15": { examLabel: "2022학년도 9월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2022_9mo__16": { examLabel: "2022학년도 9월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2022_9mo__17": { examLabel: "2022학년도 9월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2022_9mo__18": { examLabel: "2022학년도 9월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2022_9mo__19": { examLabel: "2022학년도 9월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2022_9mo__20": { examLabel: "2022학년도 9월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2023_6mo__1": { examLabel: "2023학년도 6월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2023_6mo__2": { examLabel: "2023학년도 6월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2023_6mo__3": { examLabel: "2023학년도 6월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2023_6mo__4": { examLabel: "2023학년도 6월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2023_6mo__5": { examLabel: "2023학년도 6월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2023_6mo__6": { examLabel: "2023학년도 6월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2023_6mo__7": { examLabel: "2023학년도 6월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2023_6mo__8": { examLabel: "2023학년도 6월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2023_6mo__9": { examLabel: "2023학년도 6월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2023_6mo__10": { examLabel: "2023학년도 6월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2023_6mo__11": { examLabel: "2023학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2023_6mo__12": { examLabel: "2023학년도 6월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2023_6mo__13": { examLabel: "2023학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2023_6mo__14": { examLabel: "2023학년도 6월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2023_6mo__15": { examLabel: "2023학년도 6월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2023_6mo__16": { examLabel: "2023학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2023_6mo__17": { examLabel: "2023학년도 6월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2023_6mo__18": { examLabel: "2023학년도 6월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2023_6mo__19": { examLabel: "2023학년도 6월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2023_6mo__20": { examLabel: "2023학년도 6월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2023_9mo__1": { examLabel: "2023학년도 9월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2023_9mo__2": { examLabel: "2023학년도 9월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2023_9mo__3": { examLabel: "2023학년도 9월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2023_9mo__4": { examLabel: "2023학년도 9월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2023_9mo__5": { examLabel: "2023학년도 9월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2023_9mo__6": { examLabel: "2023학년도 9월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2023_9mo__7": { examLabel: "2023학년도 9월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2023_9mo__8": { examLabel: "2023학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2023_9mo__9": { examLabel: "2023학년도 9월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2023_9mo__10": { examLabel: "2023학년도 9월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2023_9mo__11": { examLabel: "2023학년도 9월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2023_9mo__12": { examLabel: "2023학년도 9월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2023_9mo__13": { examLabel: "2023학년도 9월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2023_9mo__14": { examLabel: "2023학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2023_9mo__15": { examLabel: "2023학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2023_9mo__16": { examLabel: "2023학년도 9월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2023_9mo__17": { examLabel: "2023학년도 9월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2023_9mo__18": { examLabel: "2023학년도 9월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2023_9mo__19": { examLabel: "2023학년도 9월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2023_9mo__20": { examLabel: "2023학년도 9월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2024_6mo__1": { examLabel: "2024학년도 6월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2024_6mo__2": { examLabel: "2024학년도 6월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2024_6mo__3": { examLabel: "2024학년도 6월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2024_6mo__4": { examLabel: "2024학년도 6월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2024_6mo__5": { examLabel: "2024학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2024_6mo__6": { examLabel: "2024학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2024_6mo__7": { examLabel: "2024학년도 6월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2024_6mo__8": { examLabel: "2024학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2024_6mo__9": { examLabel: "2024학년도 6월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2024_6mo__10": { examLabel: "2024학년도 6월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2024_6mo__11": { examLabel: "2024학년도 6월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2024_6mo__12": { examLabel: "2024학년도 6월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2024_6mo__13": { examLabel: "2024학년도 6월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2024_6mo__14": { examLabel: "2024학년도 6월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2024_6mo__15": { examLabel: "2024학년도 6월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2024_6mo__16": { examLabel: "2024학년도 6월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2024_6mo__17": { examLabel: "2024학년도 6월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2024_6mo__18": { examLabel: "2024학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2024_6mo__19": { examLabel: "2024학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2024_6mo__20": { examLabel: "2024학년도 6월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2024_9mo__1": { examLabel: "2024학년도 9월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2024_9mo__2": { examLabel: "2024학년도 9월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2024_9mo__3": { examLabel: "2024학년도 9월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2024_9mo__4": { examLabel: "2024학년도 9월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2024_9mo__5": { examLabel: "2024학년도 9월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2024_9mo__6": { examLabel: "2024학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2024_9mo__7": { examLabel: "2024학년도 9월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2024_9mo__8": { examLabel: "2024학년도 9월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2024_9mo__9": { examLabel: "2024학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2024_9mo__10": { examLabel: "2024학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2024_9mo__11": { examLabel: "2024학년도 9월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2024_9mo__12": { examLabel: "2024학년도 9월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2024_9mo__13": { examLabel: "2024학년도 9월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2024_9mo__14": { examLabel: "2024학년도 9월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2024_9mo__15": { examLabel: "2024학년도 9월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2024_9mo__16": { examLabel: "2024학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2024_9mo__17": { examLabel: "2024학년도 9월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2024_9mo__18": { examLabel: "2024학년도 9월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2024_9mo__19": { examLabel: "2024학년도 9월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2024_9mo__20": { examLabel: "2024학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2025_6mo__1": { examLabel: "2025학년도 6월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2025_6mo__2": { examLabel: "2025학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2025_6mo__3": { examLabel: "2025학년도 6월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2025_6mo__4": { examLabel: "2025학년도 6월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2025_6mo__5": { examLabel: "2025학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2025_6mo__6": { examLabel: "2025학년도 6월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2025_6mo__7": { examLabel: "2025학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2025_6mo__8": { examLabel: "2025학년도 6월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2025_6mo__9": { examLabel: "2025학년도 6월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2025_6mo__10": { examLabel: "2025학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2025_6mo__11": { examLabel: "2025학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2025_6mo__12": { examLabel: "2025학년도 6월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2025_6mo__13": { examLabel: "2025학년도 6월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2025_6mo__14": { examLabel: "2025학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2025_6mo__15": { examLabel: "2025학년도 6월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2025_6mo__16": { examLabel: "2025학년도 6월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2025_6mo__17": { examLabel: "2025학년도 6월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2025_6mo__18": { examLabel: "2025학년도 6월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2025_6mo__19": { examLabel: "2025학년도 6월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2025_6mo__20": { examLabel: "2025학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2025_9mo__1": { examLabel: "2025학년도 9월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2025_9mo__2": { examLabel: "2025학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2025_9mo__3": { examLabel: "2025학년도 9월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2025_9mo__4": { examLabel: "2025학년도 9월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2025_9mo__5": { examLabel: "2025학년도 9월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2025_9mo__6": { examLabel: "2025학년도 9월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2025_9mo__7": { examLabel: "2025학년도 9월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2025_9mo__8": { examLabel: "2025학년도 9월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2025_9mo__9": { examLabel: "2025학년도 9월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2025_9mo__10": { examLabel: "2025학년도 9월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2025_9mo__11": { examLabel: "2025학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2025_9mo__12": { examLabel: "2025학년도 9월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2025_9mo__13": { examLabel: "2025학년도 9월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2025_9mo__14": { examLabel: "2025학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2025_9mo__15": { examLabel: "2025학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2025_9mo__16": { examLabel: "2025학년도 9월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2025_9mo__17": { examLabel: "2025학년도 9월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2025_9mo__18": { examLabel: "2025학년도 9월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2025_9mo__19": { examLabel: "2025학년도 9월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2025_9mo__20": { examLabel: "2025학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2026_6mo__1": { examLabel: "2026학년도 6월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2026_6mo__2": { examLabel: "2026학년도 6월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2026_6mo__3": { examLabel: "2026학년도 6월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2026_6mo__4": { examLabel: "2026학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2026_6mo__5": { examLabel: "2026학년도 6월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2026_6mo__6": { examLabel: "2026학년도 6월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2026_6mo__7": { examLabel: "2026학년도 6월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2026_6mo__8": { examLabel: "2026학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2026_6mo__9": { examLabel: "2026학년도 6월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2026_6mo__10": { examLabel: "2026학년도 6월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2026_6mo__11": { examLabel: "2026학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2026_6mo__12": { examLabel: "2026학년도 6월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2026_6mo__13": { examLabel: "2026학년도 6월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2026_6mo__14": { examLabel: "2026학년도 6월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2026_6mo__15": { examLabel: "2026학년도 6월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2026_6mo__16": { examLabel: "2026학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2026_6mo__17": { examLabel: "2026학년도 6월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2026_6mo__18": { examLabel: "2026학년도 6월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2026_6mo__19": { examLabel: "2026학년도 6월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2026_6mo__20": { examLabel: "2026학년도 6월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2026_9mo__1": { examLabel: "2026학년도 9월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2026_9mo__2": { examLabel: "2026학년도 9월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2026_9mo__3": { examLabel: "2026학년도 9월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2026_9mo__4": { examLabel: "2026학년도 9월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2026_9mo__5": { examLabel: "2026학년도 9월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2026_9mo__6": { examLabel: "2026학년도 9월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2026_9mo__7": { examLabel: "2026학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2026_9mo__8": { examLabel: "2026학년도 9월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2026_9mo__9": { examLabel: "2026학년도 9월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2026_9mo__10": { examLabel: "2026학년도 9월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2026_9mo__11": { examLabel: "2026학년도 9월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2026_9mo__12": { examLabel: "2026학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2026_9mo__13": { examLabel: "2026학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2026_9mo__14": { examLabel: "2026학년도 9월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2026_9mo__15": { examLabel: "2026학년도 9월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2026_9mo__16": { examLabel: "2026학년도 9월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2026_9mo__17": { examLabel: "2026학년도 9월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2026_9mo__18": { examLabel: "2026학년도 9월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2026_9mo__19": { examLabel: "2026학년도 9월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2026_9mo__20": { examLabel: "2026학년도 9월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2027_6mo__1": { examLabel: "2027학년도 6월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2027_6mo__2": { examLabel: "2027학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2027_6mo__3": { examLabel: "2027학년도 6월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2027_6mo__4": { examLabel: "2027학년도 6월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2027_6mo__5": { examLabel: "2027학년도 6월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2027_6mo__6": { examLabel: "2027학년도 6월 모의평가", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2027_6mo__7": { examLabel: "2027학년도 6월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2027_6mo__8": { examLabel: "2027학년도 6월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2027_6mo__9": { examLabel: "2027학년도 6월 모의평가", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
-  "2027_6mo__10": { examLabel: "2027학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2027_6mo__11": { examLabel: "2027학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2027_6mo__12": { examLabel: "2027학년도 6월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2027_6mo__13": { examLabel: "2027학년도 6월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2027_6mo__14": { examLabel: "2027학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2027_6mo__15": { examLabel: "2027학년도 6월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
-  "2027_6mo__16": { examLabel: "2027학년도 6월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2027_6mo__17": { examLabel: "2027학년도 6월 모의평가", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
-  "2027_6mo__18": { examLabel: "2027학년도 6월 모의평가", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
-  "2027_6mo__19": { examLabel: "2027학년도 6월 모의평가", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
-  "2027_6mo__20": { examLabel: "2027학년도 6월 모의평가", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2021_9mo__1": { examLabel: "2021학년도 9월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2021_9mo__2": { examLabel: "2021학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2021_9mo__3": { examLabel: "2021학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2021_9mo__4": { examLabel: "2021학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2021_9mo__5": { examLabel: "2021학년도 9월 모의평가", unit: "물질과 전자기장", material: "탐구·실험형", level: '상', points: 3, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2021_9mo__6": { examLabel: "2021학년도 9월 모의평가", unit: "물질과 전자기장", material: "개념 서술형", level: '중', points: 2, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2021_9mo__7": { examLabel: "2021학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2021_9mo__8": { examLabel: "2021학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2021_9mo__9": { examLabel: "2021학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2021_9mo__10": { examLabel: "2021학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2021_9mo__11": { examLabel: "2021학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2021_9mo__12": { examLabel: "2021학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2021_9mo__13": { examLabel: "2021학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2021_9mo__14": { examLabel: "2021학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2021_9mo__15": { examLabel: "2021학년도 9월 모의평가", unit: "역학과 에너지", material: "표(자료) 해석형", level: '상', points: 3, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2021_9mo__16": { examLabel: "2021학년도 9월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2021_9mo__17": { examLabel: "2021학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2021_9mo__18": { examLabel: "2021학년도 9월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2021_9mo__19": { examLabel: "2021학년도 9월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2021_9mo__20": { examLabel: "2021학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2021학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2021학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2022_6mo__1": { examLabel: "2022학년도 6월 모의평가", unit: "파동과 정보통신", material: "표(자료) 해석형", level: '중', points: 2, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2022_6mo__2": { examLabel: "2022학년도 6월 모의평가", unit: "물질과 전자기장", material: "개념 서술형", level: '중', points: 2, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2022_6mo__3": { examLabel: "2022학년도 6월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2022_6mo__4": { examLabel: "2022학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2022_6mo__5": { examLabel: "2022학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2022_6mo__6": { examLabel: "2022학년도 6월 모의평가", unit: "물질과 전자기장", material: "개념 서술형", level: '중', points: 2, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2022_6mo__7": { examLabel: "2022학년도 6월 모의평가", unit: "파동과 정보통신", material: "표(자료) 해석형", level: '중', points: 2, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2022_6mo__8": { examLabel: "2022학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2022_6mo__9": { examLabel: "2022학년도 6월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2022_6mo__10": { examLabel: "2022학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2022_6mo__11": { examLabel: "2022학년도 6월 모의평가", unit: "역학과 에너지", material: "탐구·실험형", level: '상', points: 3, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2022_6mo__12": { examLabel: "2022학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2022_6mo__13": { examLabel: "2022학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2022_6mo__14": { examLabel: "2022학년도 6월 모의평가", unit: "역학과 에너지", material: "표(자료) 해석형", level: '중', points: 2, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2022_6mo__15": { examLabel: "2022학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2022_6mo__16": { examLabel: "2022학년도 6월 모의평가", unit: "파동과 정보통신", material: "탐구·실험형", level: '상', points: 3, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2022_6mo__17": { examLabel: "2022학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2022_6mo__18": { examLabel: "2022학년도 6월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2022_6mo__19": { examLabel: "2022학년도 6월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2022_6mo__20": { examLabel: "2022학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2022학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2022학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2022_9mo__1": { examLabel: "2022학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2022_9mo__2": { examLabel: "2022학년도 9월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2022_9mo__3": { examLabel: "2022학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2022_9mo__4": { examLabel: "2022학년도 9월 모의평가", unit: "파동과 정보통신", material: "개념 서술형", level: '중', points: 2, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2022_9mo__5": { examLabel: "2022학년도 9월 모의평가", unit: "물질과 전자기장", material: "탐구·실험형", level: '상', points: 3, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2022_9mo__6": { examLabel: "2022학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2022_9mo__7": { examLabel: "2022학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2022_9mo__8": { examLabel: "2022학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2022_9mo__9": { examLabel: "2022학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2022_9mo__10": { examLabel: "2022학년도 9월 모의평가", unit: "역학과 에너지", material: "개념 서술형", level: '상', points: 3, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2022_9mo__11": { examLabel: "2022학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2022_9mo__12": { examLabel: "2022학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2022_9mo__13": { examLabel: "2022학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2022_9mo__14": { examLabel: "2022학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2022_9mo__15": { examLabel: "2022학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2022_9mo__16": { examLabel: "2022학년도 9월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2022_9mo__17": { examLabel: "2022학년도 9월 모의평가", unit: "물질과 전자기장", material: "탐구·실험형", level: '상', points: 3, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2022_9mo__18": { examLabel: "2022학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2022_9mo__19": { examLabel: "2022학년도 9월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2022_9mo__20": { examLabel: "2022학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2022학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2022학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2023_6mo__1": { examLabel: "2023학년도 6월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2023_6mo__2": { examLabel: "2023학년도 6월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2023_6mo__3": { examLabel: "2023학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2023_6mo__4": { examLabel: "2023학년도 6월 모의평가", unit: "파동과 정보통신", material: "개념 서술형", level: '중', points: 2, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2023_6mo__5": { examLabel: "2023학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2023_6mo__6": { examLabel: "2023학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2023_6mo__7": { examLabel: "2023학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2023_6mo__8": { examLabel: "2023학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2023_6mo__9": { examLabel: "2023학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2023_6mo__10": { examLabel: "2023학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2023_6mo__11": { examLabel: "2023학년도 6월 모의평가", unit: "역학과 에너지", material: "탐구·실험형", level: '상', points: 3, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2023_6mo__12": { examLabel: "2023학년도 6월 모의평가", unit: "물질과 전자기장", material: "표(자료) 해석형", level: '중', points: 2, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2023_6mo__13": { examLabel: "2023학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2023_6mo__14": { examLabel: "2023학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2023_6mo__15": { examLabel: "2023학년도 6월 모의평가", unit: "파동과 정보통신", material: "탐구·실험형", level: '상', points: 3, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2023_6mo__16": { examLabel: "2023학년도 6월 모의평가", unit: "역학과 에너지", material: "표(자료) 해석형", level: '상', points: 3, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2023_6mo__17": { examLabel: "2023학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2023_6mo__18": { examLabel: "2023학년도 6월 모의평가", unit: "물질과 전자기장", material: "표(자료) 해석형", level: '상', points: 3, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2023_6mo__19": { examLabel: "2023학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2023_6mo__20": { examLabel: "2023학년도 6월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2023학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2023학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2023_9mo__1": { examLabel: "2023학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2023_9mo__2": { examLabel: "2023학년도 9월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2023_9mo__3": { examLabel: "2023학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2023_9mo__4": { examLabel: "2023학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2023_9mo__5": { examLabel: "2023학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2023_9mo__6": { examLabel: "2023학년도 9월 모의평가", unit: "물질과 전자기장", material: "개념 서술형", level: '중', points: 2, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2023_9mo__7": { examLabel: "2023학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2023_9mo__8": { examLabel: "2023학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2023_9mo__9": { examLabel: "2023학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2023_9mo__10": { examLabel: "2023학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2023_9mo__11": { examLabel: "2023학년도 9월 모의평가", unit: "파동과 정보통신", material: "개념 서술형", level: '중', points: 2, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2023_9mo__12": { examLabel: "2023학년도 9월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2023_9mo__13": { examLabel: "2023학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2023_9mo__14": { examLabel: "2023학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2023_9mo__15": { examLabel: "2023학년도 9월 모의평가", unit: "역학과 에너지", material: "표(자료) 해석형", level: '중', points: 2, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2023_9mo__16": { examLabel: "2023학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2023_9mo__17": { examLabel: "2023학년도 9월 모의평가", unit: "물질과 전자기장", material: "탐구·실험형", level: '상', points: 3, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2023_9mo__18": { examLabel: "2023학년도 9월 모의평가", unit: "물질과 전자기장", material: "표(자료) 해석형", level: '중', points: 2, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2023_9mo__19": { examLabel: "2023학년도 9월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2023_9mo__20": { examLabel: "2023학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2023학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2023학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2024_6mo__1": { examLabel: "2024학년도 6월 모의평가", unit: "파동과 정보통신", material: "개념 서술형", level: '중', points: 2, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2024_6mo__2": { examLabel: "2024학년도 6월 모의평가", unit: "물질과 전자기장", material: "개념 서술형", level: '중', points: 2, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2024_6mo__3": { examLabel: "2024학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2024_6mo__4": { examLabel: "2024학년도 6월 모의평가", unit: "물질과 전자기장", material: "탐구·실험형", level: '중', points: 2, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2024_6mo__5": { examLabel: "2024학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2024_6mo__6": { examLabel: "2024학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2024_6mo__7": { examLabel: "2024학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2024_6mo__8": { examLabel: "2024학년도 6월 모의평가", unit: "역학과 에너지", material: "표(자료) 해석형", level: '상', points: 3, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2024_6mo__9": { examLabel: "2024학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2024_6mo__10": { examLabel: "2024학년도 6월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2024_6mo__11": { examLabel: "2024학년도 6월 모의평가", unit: "물질과 전자기장", material: "탐구·실험형", level: '중', points: 2, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2024_6mo__12": { examLabel: "2024학년도 6월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2024_6mo__13": { examLabel: "2024학년도 6월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2024_6mo__14": { examLabel: "2024학년도 6월 모의평가", unit: "파동과 정보통신", material: "표(자료) 해석형", level: '중', points: 2, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2024_6mo__15": { examLabel: "2024학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2024_6mo__16": { examLabel: "2024학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2024_6mo__17": { examLabel: "2024학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2024_6mo__18": { examLabel: "2024학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2024_6mo__19": { examLabel: "2024학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2024_6mo__20": { examLabel: "2024학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2024학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2024학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2024_9mo__1": { examLabel: "2024학년도 9월 모의평가", unit: "파동과 정보통신", material: "개념 서술형", level: '중', points: 2, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2024_9mo__2": { examLabel: "2024학년도 9월 모의평가", unit: "물질과 전자기장", material: "개념 서술형", level: '중', points: 2, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2024_9mo__3": { examLabel: "2024학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2024_9mo__4": { examLabel: "2024학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2024_9mo__5": { examLabel: "2024학년도 9월 모의평가", unit: "물질과 전자기장", material: "탐구·실험형", level: '중', points: 2, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2024_9mo__6": { examLabel: "2024학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2024_9mo__7": { examLabel: "2024학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2024_9mo__8": { examLabel: "2024학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2024_9mo__9": { examLabel: "2024학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2024_9mo__10": { examLabel: "2024학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2024_9mo__11": { examLabel: "2024학년도 9월 모의평가", unit: "물질과 전자기장", material: "탐구·실험형", level: '상', points: 3, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2024_9mo__12": { examLabel: "2024학년도 9월 모의평가", unit: "물질과 전자기장", material: "표(자료) 해석형", level: '상', points: 3, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2024_9mo__13": { examLabel: "2024학년도 9월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2024_9mo__14": { examLabel: "2024학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2024_9mo__15": { examLabel: "2024학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2024_9mo__16": { examLabel: "2024학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2024_9mo__17": { examLabel: "2024학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2024_9mo__18": { examLabel: "2024학년도 9월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2024_9mo__19": { examLabel: "2024학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2024_9mo__20": { examLabel: "2024학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2024학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2024학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2025_6mo__1": { examLabel: "2025학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2025_6mo__2": { examLabel: "2025학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2025_6mo__3": { examLabel: "2025학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2025_6mo__4": { examLabel: "2025학년도 6월 모의평가", unit: "물질과 전자기장", material: "개념 서술형", level: '중', points: 2, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2025_6mo__5": { examLabel: "2025학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2025_6mo__6": { examLabel: "2025학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2025_6mo__7": { examLabel: "2025학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2025_6mo__8": { examLabel: "2025학년도 6월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2025_6mo__9": { examLabel: "2025학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2025_6mo__10": { examLabel: "2025학년도 6월 모의평가", unit: "역학과 에너지", material: "표(자료) 해석형", level: '상', points: 3, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2025_6mo__11": { examLabel: "2025학년도 6월 모의평가", unit: "역학과 에너지", material: "탐구·실험형", level: '상', points: 3, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2025_6mo__12": { examLabel: "2025학년도 6월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2025_6mo__13": { examLabel: "2025학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2025_6mo__14": { examLabel: "2025학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2025_6mo__15": { examLabel: "2025학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2025_6mo__16": { examLabel: "2025학년도 6월 모의평가", unit: "물질과 전자기장", material: "탐구·실험형", level: '중', points: 2, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2025_6mo__17": { examLabel: "2025학년도 6월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2025_6mo__18": { examLabel: "2025학년도 6월 모의평가", unit: "물질과 전자기장", material: "표(자료) 해석형", level: '상', points: 3, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2025_6mo__19": { examLabel: "2025학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2025_6mo__20": { examLabel: "2025학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2025학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2025학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2025_9mo__1": { examLabel: "2025학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2025_9mo__2": { examLabel: "2025학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2025_9mo__3": { examLabel: "2025학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2025_9mo__4": { examLabel: "2025학년도 9월 모의평가", unit: "물질과 전자기장", material: "개념 서술형", level: '상', points: 3, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2025_9mo__5": { examLabel: "2025학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2025_9mo__6": { examLabel: "2025학년도 9월 모의평가", unit: "물질과 전자기장", material: "표(자료) 해석형", level: '상', points: 3, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2025_9mo__7": { examLabel: "2025학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2025_9mo__8": { examLabel: "2025학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2025_9mo__9": { examLabel: "2025학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2025_9mo__10": { examLabel: "2025학년도 9월 모의평가", unit: "역학과 에너지", material: "탐구·실험형", level: '상', points: 3, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2025_9mo__11": { examLabel: "2025학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2025_9mo__12": { examLabel: "2025학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2025_9mo__13": { examLabel: "2025학년도 9월 모의평가", unit: "물질과 전자기장", material: "탐구·실험형", level: '상', points: 3, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2025_9mo__14": { examLabel: "2025학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2025_9mo__15": { examLabel: "2025학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2025_9mo__16": { examLabel: "2025학년도 9월 모의평가", unit: "물질과 전자기장", material: "표(자료) 해석형", level: '상', points: 3, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2025_9mo__17": { examLabel: "2025학년도 9월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2025_9mo__18": { examLabel: "2025학년도 9월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2025_9mo__19": { examLabel: "2025학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2025_9mo__20": { examLabel: "2025학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2025학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2025학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2026_6mo__1": { examLabel: "2026학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2026_6mo__2": { examLabel: "2026학년도 6월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2026_6mo__3": { examLabel: "2026학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2026_6mo__4": { examLabel: "2026학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2026_6mo__5": { examLabel: "2026학년도 6월 모의평가", unit: "물질과 전자기장", material: "탐구·실험형", level: '중', points: 2, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2026_6mo__6": { examLabel: "2026학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2026_6mo__7": { examLabel: "2026학년도 6월 모의평가", unit: "파동과 정보통신", material: "표(자료) 해석형", level: '중', points: 2, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2026_6mo__8": { examLabel: "2026학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2026_6mo__9": { examLabel: "2026학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2026_6mo__10": { examLabel: "2026학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2026_6mo__11": { examLabel: "2026학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2026_6mo__12": { examLabel: "2026학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2026_6mo__13": { examLabel: "2026학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2026_6mo__14": { examLabel: "2026학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2026_6mo__15": { examLabel: "2026학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2026_6mo__16": { examLabel: "2026학년도 6월 모의평가", unit: "역학과 에너지", material: "표(자료) 해석형", level: '상', points: 3, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2026_6mo__17": { examLabel: "2026학년도 6월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2026_6mo__18": { examLabel: "2026학년도 6월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2026_6mo__19": { examLabel: "2026학년도 6월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2026_6mo__20": { examLabel: "2026학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2026학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2026_9mo__1": { examLabel: "2026학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2026_9mo__2": { examLabel: "2026학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2026_9mo__3": { examLabel: "2026학년도 9월 모의평가", unit: "물질과 전자기장", material: "개념 서술형", level: '중', points: 2, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2026_9mo__4": { examLabel: "2026학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2026_9mo__5": { examLabel: "2026학년도 9월 모의평가", unit: "물질과 전자기장", material: "탐구·실험형", level: '상', points: 3, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2026_9mo__6": { examLabel: "2026학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2026_9mo__7": { examLabel: "2026학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2026_9mo__8": { examLabel: "2026학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2026_9mo__9": { examLabel: "2026학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2026_9mo__10": { examLabel: "2026학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2026_9mo__11": { examLabel: "2026학년도 9월 모의평가", unit: "물질과 전자기장", material: "표(자료) 해석형", level: '중', points: 2, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2026_9mo__12": { examLabel: "2026학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2026_9mo__13": { examLabel: "2026학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2026_9mo__14": { examLabel: "2026학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2026_9mo__15": { examLabel: "2026학년도 9월 모의평가", unit: "물질과 전자기장", material: "표(자료) 해석형", level: '상', points: 3, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2026_9mo__16": { examLabel: "2026학년도 9월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2026_9mo__17": { examLabel: "2026학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2026_9mo__18": { examLabel: "2026학년도 9월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2026_9mo__19": { examLabel: "2026학년도 9월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2026_9mo__20": { examLabel: "2026학년도 9월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026학년도 9월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2026학년도 9월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2027_6mo__1": { examLabel: "2027학년도 6월 모의평가", unit: "파동과 정보통신", material: "개념 서술형", level: '중', points: 2, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2027_6mo__2": { examLabel: "2027학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2027_6mo__3": { examLabel: "2027학년도 6월 모의평가", unit: "물질과 전자기장", material: "개념 서술형", level: '중', points: 2, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2027_6mo__4": { examLabel: "2027학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2027_6mo__5": { examLabel: "2027학년도 6월 모의평가", unit: "파동과 정보통신", material: "표(자료) 해석형", level: '중', points: 2, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2027_6mo__6": { examLabel: "2027학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 1, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2027_6mo__7": { examLabel: "2027학년도 6월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2027_6mo__8": { examLabel: "2027학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2027_6mo__9": { examLabel: "2027학년도 6월 모의평가", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 1 },
+  "2027_6mo__10": { examLabel: "2027학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2027_6mo__11": { examLabel: "2027학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 2, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2027_6mo__12": { examLabel: "2027학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2027_6mo__13": { examLabel: "2027학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2027_6mo__14": { examLabel: "2027학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2027_6mo__15": { examLabel: "2027학년도 6월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 3 },
+  "2027_6mo__16": { examLabel: "2027학년도 6월 모의평가", unit: "물질과 전자기장", material: "탐구·실험형", level: '상', points: 3, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 3, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2027_6mo__17": { examLabel: "2027학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
+  "2027_6mo__18": { examLabel: "2027학년도 6월 모의평가", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 5 },
+  "2027_6mo__19": { examLabel: "2027학년도 6월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 4 },
+  "2027_6mo__20": { examLabel: "2027학년도 6월 모의평가", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2027학년도 6월 모의평가 문제지.pdf", problemPage: 4, answerPdf: "2027학년도 6월 모의평가 답.pdf", answerPage: 1, answer: 2 },
 
   // ===== 2026학년도 3월/5월/7월 학력평가 추가 (60문항) =====
-  "2026_3mo__1": { examLabel: "2026학년도 3월 모의고사", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 3 },
-  "2026_3mo__2": { examLabel: "2026학년도 3월 모의고사", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 1 },
-  "2026_3mo__3": { examLabel: "2026학년도 3월 모의고사", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 4 },
-  "2026_3mo__4": { examLabel: "2026학년도 3월 모의고사", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 5 },
-  "2026_3mo__5": { examLabel: "2026학년도 3월 모의고사", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 3 },
-  "2026_3mo__6": { examLabel: "2026학년도 3월 모의고사", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 1 },
-  "2026_3mo__7": { examLabel: "2026학년도 3월 모의고사", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 2 },
-  "2026_3mo__8": { examLabel: "2026학년도 3월 모의고사", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 3 },
-  "2026_3mo__9": { examLabel: "2026학년도 3월 모의고사", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 4 },
-  "2026_3mo__10": { examLabel: "2026학년도 3월 모의고사", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 5 },
-  "2026_3mo__11": { examLabel: "2026학년도 3월 모의고사", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 3 },
-  "2026_3mo__12": { examLabel: "2026학년도 3월 모의고사", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 2 },
-  "2026_3mo__13": { examLabel: "2026학년도 3월 모의고사", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 4 },
-  "2026_3mo__14": { examLabel: "2026학년도 3월 모의고사", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 5 },
-  "2026_3mo__15": { examLabel: "2026학년도 3월 모의고사", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 3 },
-  "2026_3mo__16": { examLabel: "2026학년도 3월 모의고사", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 1 },
-  "2026_3mo__17": { examLabel: "2026학년도 3월 모의고사", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 4, answerPdf: "", answerPage: 1, answer: 2 },
-  "2026_3mo__18": { examLabel: "2026학년도 3월 모의고사", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 4, answerPdf: "", answerPage: 1, answer: 1 },
-  "2026_3mo__19": { examLabel: "2026학년도 3월 모의고사", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 4, answerPdf: "", answerPage: 1, answer: 4 },
-  "2026_3mo__20": { examLabel: "2026학년도 3월 모의고사", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 4, answerPdf: "", answerPage: 1, answer: 5 },
-  "2026_5mo__1": { examLabel: "2026학년도 5월 모의고사", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 3 },
-  "2026_5mo__2": { examLabel: "2026학년도 5월 모의고사", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 4 },
-  "2026_5mo__3": { examLabel: "2026학년도 5월 모의고사", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 5 },
-  "2026_5mo__4": { examLabel: "2026학년도 5월 모의고사", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 2 },
-  "2026_5mo__5": { examLabel: "2026학년도 5월 모의고사", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 3 },
-  "2026_5mo__6": { examLabel: "2026학년도 5월 모의고사", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 2 },
-  "2026_5mo__7": { examLabel: "2026학년도 5월 모의고사", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 2 },
-  "2026_5mo__8": { examLabel: "2026학년도 5월 모의고사", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 1 },
-  "2026_5mo__9": { examLabel: "2026학년도 5월 모의고사", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 4 },
-  "2026_5mo__10": { examLabel: "2026학년도 5월 모의고사", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 1 },
-  "2026_5mo__11": { examLabel: "2026학년도 5월 모의고사", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 5 },
-  "2026_5mo__12": { examLabel: "2026학년도 5월 모의고사", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 2 },
-  "2026_5mo__13": { examLabel: "2026학년도 5월 모의고사", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 5 },
-  "2026_5mo__14": { examLabel: "2026학년도 5월 모의고사", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 2 },
-  "2026_5mo__15": { examLabel: "2026학년도 5월 모의고사", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 5 },
-  "2026_5mo__16": { examLabel: "2026학년도 5월 모의고사", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 1 },
-  "2026_5mo__17": { examLabel: "2026학년도 5월 모의고사", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 4, answerPdf: "", answerPage: 1, answer: 3 },
-  "2026_5mo__18": { examLabel: "2026학년도 5월 모의고사", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 4, answerPdf: "", answerPage: 1, answer: 5 },
-  "2026_5mo__19": { examLabel: "2026학년도 5월 모의고사", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 4, answerPdf: "", answerPage: 1, answer: 1 },
-  "2026_5mo__20": { examLabel: "2026학년도 5월 모의고사", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 4, answerPdf: "", answerPage: 1, answer: 4 },
-  "2026_7mo__1": { examLabel: "2026학년도 7월 모의고사", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 2 },
-  "2026_7mo__2": { examLabel: "2026학년도 7월 모의고사", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 3 },
-  "2026_7mo__3": { examLabel: "2026학년도 7월 모의고사", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 4 },
-  "2026_7mo__4": { examLabel: "2026학년도 7월 모의고사", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 5 },
-  "2026_7mo__5": { examLabel: "2026학년도 7월 모의고사", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 3 },
-  "2026_7mo__6": { examLabel: "2026학년도 7월 모의고사", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 1 },
-  "2026_7mo__7": { examLabel: "2026학년도 7월 모의고사", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 1 },
-  "2026_7mo__8": { examLabel: "2026학년도 7월 모의고사", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 1 },
-  "2026_7mo__9": { examLabel: "2026학년도 7월 모의고사", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 5 },
-  "2026_7mo__10": { examLabel: "2026학년도 7월 모의고사", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 2 },
-  "2026_7mo__11": { examLabel: "2026학년도 7월 모의고사", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 4 },
-  "2026_7mo__12": { examLabel: "2026학년도 7월 모의고사", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 3 },
-  "2026_7mo__13": { examLabel: "2026학년도 7월 모의고사", unit: "파동과 정보통신", level: '상', points: 3, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 3 },
-  "2026_7mo__14": { examLabel: "2026학년도 7월 모의고사", unit: "역학과 에너지", level: '중', points: 2, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 5 },
-  "2026_7mo__15": { examLabel: "2026학년도 7월 모의고사", unit: "파동과 정보통신", level: '중', points: 2, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 5 },
-  "2026_7mo__16": { examLabel: "2026학년도 7월 모의고사", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 1 },
-  "2026_7mo__17": { examLabel: "2026학년도 7월 모의고사", unit: "물질과 전자기장", level: '중', points: 2, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 4, answerPdf: "", answerPage: 1, answer: 4 },
-  "2026_7mo__18": { examLabel: "2026학년도 7월 모의고사", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 4, answerPdf: "", answerPage: 1, answer: 2 },
-  "2026_7mo__19": { examLabel: "2026학년도 7월 모의고사", unit: "역학과 에너지", level: '상', points: 3, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 4, answerPdf: "", answerPage: 1, answer: 4 },
-  "2026_7mo__20": { examLabel: "2026학년도 7월 모의고사", unit: "물질과 전자기장", level: '상', points: 3, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 4, answerPdf: "", answerPage: 1, answer: 4 },
+  "2026_3mo__1": { examLabel: "2026학년도 3월 모의고사", unit: "파동과 정보통신", material: "개념 서술형", level: '중', points: 2, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 3 },
+  "2026_3mo__2": { examLabel: "2026학년도 3월 모의고사", unit: "파동과 정보통신", material: "개념 서술형", level: '중', points: 2, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 1 },
+  "2026_3mo__3": { examLabel: "2026학년도 3월 모의고사", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 4 },
+  "2026_3mo__4": { examLabel: "2026학년도 3월 모의고사", unit: "물질과 전자기장", material: "탐구·실험형", level: '상', points: 3, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 5 },
+  "2026_3mo__5": { examLabel: "2026학년도 3월 모의고사", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 3 },
+  "2026_3mo__6": { examLabel: "2026학년도 3월 모의고사", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 1 },
+  "2026_3mo__7": { examLabel: "2026학년도 3월 모의고사", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 2 },
+  "2026_3mo__8": { examLabel: "2026학년도 3월 모의고사", unit: "파동과 정보통신", material: "표(자료) 해석형", level: '상', points: 3, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 3 },
+  "2026_3mo__9": { examLabel: "2026학년도 3월 모의고사", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 4 },
+  "2026_3mo__10": { examLabel: "2026학년도 3월 모의고사", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 5 },
+  "2026_3mo__11": { examLabel: "2026학년도 3월 모의고사", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 3 },
+  "2026_3mo__12": { examLabel: "2026학년도 3월 모의고사", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 2 },
+  "2026_3mo__13": { examLabel: "2026학년도 3월 모의고사", unit: "파동과 정보통신", material: "표(자료) 해석형", level: '중', points: 2, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 4 },
+  "2026_3mo__14": { examLabel: "2026학년도 3월 모의고사", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 5 },
+  "2026_3mo__15": { examLabel: "2026학년도 3월 모의고사", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 3 },
+  "2026_3mo__16": { examLabel: "2026학년도 3월 모의고사", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 1 },
+  "2026_3mo__17": { examLabel: "2026학년도 3월 모의고사", unit: "역학과 에너지", material: "표(자료) 해석형", level: '중', points: 2, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 4, answerPdf: "", answerPage: 1, answer: 2 },
+  "2026_3mo__18": { examLabel: "2026학년도 3월 모의고사", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 4, answerPdf: "", answerPage: 1, answer: 1 },
+  "2026_3mo__19": { examLabel: "2026학년도 3월 모의고사", unit: "물질과 전자기장", material: "표(자료) 해석형", level: '상', points: 3, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 4, answerPdf: "", answerPage: 1, answer: 4 },
+  "2026_3mo__20": { examLabel: "2026학년도 3월 모의고사", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026년_3월_모의고사_문제.pdf", problemPage: 4, answerPdf: "", answerPage: 1, answer: 5 },
+  "2026_5mo__1": { examLabel: "2026학년도 5월 모의고사", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 3 },
+  "2026_5mo__2": { examLabel: "2026학년도 5월 모의고사", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 4 },
+  "2026_5mo__3": { examLabel: "2026학년도 5월 모의고사", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 5 },
+  "2026_5mo__4": { examLabel: "2026학년도 5월 모의고사", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 2 },
+  "2026_5mo__5": { examLabel: "2026학년도 5월 모의고사", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 3 },
+  "2026_5mo__6": { examLabel: "2026학년도 5월 모의고사", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 2 },
+  "2026_5mo__7": { examLabel: "2026학년도 5월 모의고사", unit: "파동과 정보통신", material: "표(자료) 해석형", level: '상', points: 3, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 2 },
+  "2026_5mo__8": { examLabel: "2026학년도 5월 모의고사", unit: "물질과 전자기장", material: "개념 서술형", level: '중', points: 2, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 1 },
+  "2026_5mo__9": { examLabel: "2026학년도 5월 모의고사", unit: "물질과 전자기장", material: "개념 서술형", level: '상', points: 3, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 4 },
+  "2026_5mo__10": { examLabel: "2026학년도 5월 모의고사", unit: "역학과 에너지", material: "개념 서술형", level: '상', points: 3, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 1 },
+  "2026_5mo__11": { examLabel: "2026학년도 5월 모의고사", unit: "물질과 전자기장", material: "개념 서술형", level: '중', points: 2, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 5 },
+  "2026_5mo__12": { examLabel: "2026학년도 5월 모의고사", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 2 },
+  "2026_5mo__13": { examLabel: "2026학년도 5월 모의고사", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 5 },
+  "2026_5mo__14": { examLabel: "2026학년도 5월 모의고사", unit: "물질과 전자기장", material: "표(자료) 해석형", level: '상', points: 3, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 2 },
+  "2026_5mo__15": { examLabel: "2026학년도 5월 모의고사", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 5 },
+  "2026_5mo__16": { examLabel: "2026학년도 5월 모의고사", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 1 },
+  "2026_5mo__17": { examLabel: "2026학년도 5월 모의고사", unit: "물질과 전자기장", material: "탐구·실험형", level: '중', points: 2, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 4, answerPdf: "", answerPage: 1, answer: 3 },
+  "2026_5mo__18": { examLabel: "2026학년도 5월 모의고사", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 4, answerPdf: "", answerPage: 1, answer: 5 },
+  "2026_5mo__19": { examLabel: "2026학년도 5월 모의고사", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 4, answerPdf: "", answerPage: 1, answer: 1 },
+  "2026_5mo__20": { examLabel: "2026학년도 5월 모의고사", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026년_5월_모의고사_문제.pdf", problemPage: 4, answerPdf: "", answerPage: 1, answer: 4 },
+  "2026_7mo__1": { examLabel: "2026학년도 7월 모의고사", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 2 },
+  "2026_7mo__2": { examLabel: "2026학년도 7월 모의고사", unit: "물질과 전자기장", material: "개념 서술형", level: '중', points: 2, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 3 },
+  "2026_7mo__3": { examLabel: "2026학년도 7월 모의고사", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 4 },
+  "2026_7mo__4": { examLabel: "2026학년도 7월 모의고사", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 5 },
+  "2026_7mo__5": { examLabel: "2026학년도 7월 모의고사", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 1, answerPdf: "", answerPage: 1, answer: 3 },
+  "2026_7mo__6": { examLabel: "2026학년도 7월 모의고사", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 1 },
+  "2026_7mo__7": { examLabel: "2026학년도 7월 모의고사", unit: "역학과 에너지", material: "표(자료) 해석형", level: '상', points: 3, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 1 },
+  "2026_7mo__8": { examLabel: "2026학년도 7월 모의고사", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 1 },
+  "2026_7mo__9": { examLabel: "2026학년도 7월 모의고사", unit: "역학과 에너지", material: "표(자료) 해석형", level: '상', points: 3, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 5 },
+  "2026_7mo__10": { examLabel: "2026학년도 7월 모의고사", unit: "물질과 전자기장", material: "탐구·실험형", level: '중', points: 2, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 2, answerPdf: "", answerPage: 1, answer: 2 },
+  "2026_7mo__11": { examLabel: "2026학년도 7월 모의고사", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 4 },
+  "2026_7mo__12": { examLabel: "2026학년도 7월 모의고사", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 3 },
+  "2026_7mo__13": { examLabel: "2026학년도 7월 모의고사", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 3 },
+  "2026_7mo__14": { examLabel: "2026학년도 7월 모의고사", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 5 },
+  "2026_7mo__15": { examLabel: "2026학년도 7월 모의고사", unit: "파동과 정보통신", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 5 },
+  "2026_7mo__16": { examLabel: "2026학년도 7월 모의고사", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '중', points: 2, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 3, answerPdf: "", answerPage: 1, answer: 1 },
+  "2026_7mo__17": { examLabel: "2026학년도 7월 모의고사", unit: "물질과 전자기장", material: "표(자료) 해석형", level: '중', points: 2, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 4, answerPdf: "", answerPage: 1, answer: 4 },
+  "2026_7mo__18": { examLabel: "2026학년도 7월 모의고사", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 4, answerPdf: "", answerPage: 1, answer: 2 },
+  "2026_7mo__19": { examLabel: "2026학년도 7월 모의고사", unit: "역학과 에너지", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 4, answerPdf: "", answerPage: 1, answer: 4 },
+  "2026_7mo__20": { examLabel: "2026학년도 7월 모의고사", unit: "물질과 전자기장", material: "그래프·그림 해석형", level: '상', points: 3, problemPdf: "2026년_7월_모의고사_문제.pdf", problemPage: 4, answerPdf: "", answerPage: 1, answer: 4 },
 };
 
 /* ====================================================================== */
@@ -919,6 +959,13 @@ const QUESTION_MAP = {
 let state = {
   exam: null,
   wrongQuestions: [],   // [qnum, qnum, ...]
+  wrongReasons: {},     // { qnum: "concept" | "data" | "logic" }
+};
+
+const REASON_LABELS = {
+  concept: "개념 누수",
+  data: "자료 해석 오류",
+  logic: "추론·계산 실수",
 };
 
 const $ = (sel) => document.querySelector(sel);
@@ -954,6 +1001,7 @@ function renderExamList(){
       document.querySelectorAll(".exam-item").forEach(el => el.classList.remove("selected"));
       div.classList.add("selected");
       state.wrongQuestions = [];
+      state.wrongReasons = {};
       renderGrid();
       goStep(2);
     });
@@ -973,6 +1021,7 @@ function renderGrid(){
     cell.addEventListener("click", () => toggleWrong(i, cell));
     grid.appendChild(cell);
   }
+  $("#wrongReasonList").innerHTML = "";
   $("#toStep4").disabled = true;
 }
 
@@ -980,12 +1029,44 @@ function toggleWrong(qnum, cell){
   const idx = state.wrongQuestions.indexOf(qnum);
   if(idx >= 0){
     state.wrongQuestions.splice(idx, 1);
+    delete state.wrongReasons[qnum];
     cell.classList.remove("wrong");
   } else {
     state.wrongQuestions.push(qnum);
+    state.wrongReasons[qnum] = "concept";
     cell.classList.add("wrong");
   }
+  state.wrongQuestions.sort((a,b) => a-b);
   $("#toStep4").disabled = state.wrongQuestions.length === 0;
+  renderWrongReasonList();
+}
+
+// 오답 원인 선택 UI — 문항마다 개념 누수 / 자료 해석 오류 / 추론·계산 실수 중 하나를 고름
+function renderWrongReasonList(){
+  const wrap = $("#wrongReasonList");
+  wrap.innerHTML = "";
+  state.wrongQuestions.forEach(qnum => {
+    const row = document.createElement("div");
+    row.className = "wrong-reason-row";
+    const currentReason = state.wrongReasons[qnum] || "concept";
+    row.innerHTML = `
+      <div class="qlabel">${qnum}번 오답 원인</div>
+      <div class="reason-opts">
+        ${Object.entries(REASON_LABELS).map(([key, label]) => `
+          <button type="button" class="reason-btn ${key === currentReason ? 'active' : ''}" data-qnum="${qnum}" data-reason="${key}">${label}</button>
+        `).join("")}
+      </div>
+    `;
+    wrap.appendChild(row);
+  });
+  wrap.querySelectorAll(".reason-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const qnum = Number(btn.dataset.qnum);
+      state.wrongReasons[qnum] = btn.dataset.reason;
+      wrap.querySelectorAll(`.reason-btn[data-qnum="${qnum}"]`).forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+    });
+  });
 }
 
 $("#toStep4").addEventListener("click", () => {
@@ -1035,6 +1116,8 @@ function renderRecommendations(){
   state.wrongQuestions.forEach(qnum => {
     const key = `${state.exam.id}__${qnum}`;
     const info = QUESTION_MAP[key];
+    const reason = state.wrongReasons[qnum] || "concept";
+    const reasonLabel = REASON_LABELS[reason];
 
     if(!info){
       const badge = document.createElement("div");
@@ -1051,18 +1134,35 @@ function renderRecommendations(){
 
     const badge = document.createElement("div");
     badge.className = "wrong-badge";
-    badge.innerHTML = `❌ <b>${qnum}번 오답</b> · ${info.unit} · ${state.exam.label}`;
+    badge.innerHTML = `❌ <b>${qnum}번 오답</b> · ${info.unit} · ${reasonLabel} · ${state.exam.label}`;
     wrap.appendChild(badge);
 
-    // 같은 단원의 다른 문항 추천 (자기 자신 제외)
-    let matches = Object.entries(QUESTION_MAP).filter(
-      ([k, v]) => k !== key && v.unit === info.unit
-    );
+    // 오답 원인에 따라 추천 기준을 다르게 적용
+    //  - 개념 누수      : 같은 단원의 문제 (개념 자체를 더 다져야 함)
+    //  - 자료 해석 오류 : 단원과 무관하게 같은 자료 유형(그래프/표/실험)의 문제 (자료 읽는 연습)
+    //  - 추론·계산 실수 : 단원과 무관하게 배점 3점(복합 추론형) 문제 (다단계 추론 연습)
+    let matches, poolLabel;
+    if(reason === "data"){
+      matches = Object.entries(QUESTION_MAP).filter(
+        ([k, v]) => k !== key && v.material === info.material
+      );
+      poolLabel = `'${info.material}' 자료 유형`;
+    } else if(reason === "logic"){
+      matches = Object.entries(QUESTION_MAP).filter(
+        ([k, v]) => k !== key && v.points === 3
+      );
+      poolLabel = `배점 3점(복합 추론형)`;
+    } else {
+      matches = Object.entries(QUESTION_MAP).filter(
+        ([k, v]) => k !== key && v.unit === info.unit
+      );
+      poolLabel = `'${info.unit}' 단원`;
+    }
 
     if(matches.length === 0){
       const note = document.createElement("div");
       note.className = "empty-note";
-      note.textContent = `'${info.unit}' 단원에 등록된 다른 추천 문제가 아직 없습니다. 문항 매핑표에 데이터를 더 추가해 주세요.`;
+      note.textContent = `${poolLabel}에 등록된 다른 추천 문제가 아직 없습니다. 문항 매핑표에 데이터를 더 추가해 주세요.`;
       wrap.appendChild(note);
       return;
     }
@@ -1079,13 +1179,11 @@ function renderRecommendations(){
     const totalCount = matches.length;
     matches = matches.slice(0, MAX_RECOMMEND);
 
-    if(totalCount > matches.length){
-      const info2 = document.createElement("div");
-      info2.className = "empty-note";
-      info2.style.marginBottom = "10px";
-      info2.textContent = `'${info.unit}' 단원 전체 ${totalCount}문항 중, 난이도가 비슷하고 최근 연도인 문제 ${matches.length}개를 추천합니다.`;
-      wrap.appendChild(info2);
-    }
+    const info2 = document.createElement("div");
+    info2.className = "empty-note";
+    info2.style.marginBottom = "10px";
+    info2.textContent = `${poolLabel} 전체 ${totalCount}문항 중, 난이도가 비슷하고 최근 연도인 문제 ${matches.length}개를 추천합니다.`;
+    wrap.appendChild(info2);
 
     matches.forEach(([mkey, m]) => {
       const block = document.createElement("div");
@@ -1093,7 +1191,7 @@ function renderRecommendations(){
       const answerId = `ans-${mkey}`;
       block.innerHTML = `
         <div class="title">${m.examLabel} ${mkey.split("__")[1]}번 <span class="sample-flag">SAMPLE</span></div>
-        <div class="meta">물리학Ⅰ &gt; ${m.unit} · 난이도: ${m.level} · 배점: ${m.points}점</div>
+        <div class="meta">물리학Ⅰ &gt; ${m.unit} · ${m.material} · 난이도: ${m.level} · 배점: ${m.points}점</div>
         ${questionImageBlock(mkey, m)}
         <button class="answer-toggle" data-target="${answerId}">정답 보기</button>
         <div class="answer-box" id="${answerId}">
@@ -1131,6 +1229,7 @@ $("#backTo3").addEventListener("click", () => goStep(2));
 $("#restart").addEventListener("click", () => {
   state.exam = null;
   state.wrongQuestions = [];
+  state.wrongReasons = {};
   goStep(1);
 });
 
